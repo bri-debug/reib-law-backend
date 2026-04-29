@@ -1,10 +1,12 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 const mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-var path = require('path');
-require('dotenv').config({ path: __dirname + '/.env' });
+
 var app = express();
+var server = null;
+
 app.disable('x-powered-by');
 app.disable('Server');
 
@@ -32,6 +34,11 @@ app.use(function (req, res, next) {
         'Content-Type,access-token,x-http-method-override,x-access-token,authorization'
     );
     res.setHeader('Access-Control-Expose-Headers', 'Content-Type,expire');
+
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+
     next();
 });
 
@@ -41,29 +48,23 @@ global.constants = require(global.appPath + '/config/constants');
 var apiRouter = require('./routes/apiRoutes');
 var adminRouter = require('./routes/adminRoutes');
 var port = normalizePort(process.env.PORT || '4078');
+
 app.set('port', port);
-
-var server = require('http').createServer(app);
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
 
 function InterceptorForAllResponse(req, res, next) {
     var oldSend = res.send;
-    res.send = function (data) {
-        // arguments[0] (or `data`) contains the response body
+    res.send = function () {
         oldSend.apply(res, arguments);
     };
     next();
 }
 
 app.use(InterceptorForAllResponse);
-app.use('/api', apiRouter); // API Routes
-app.use('/admin', adminRouter); // ADMIN Routes
-app.get("/", (req, res) => {
-  res.send("Server running 🚀")
-})
+app.use('/api', apiRouter);
+app.use('/admin', adminRouter);
+app.get('/', function (req, res) {
+    res.send('Server running');
+});
 
 app.use(function (req, res, next) {
     next(createError(404));
@@ -76,14 +77,12 @@ app.use(function (err, req, res, next) {
 });
 
 function normalizePort(val) {
-    var port = parseInt(val, 10);
-    if (isNaN(port)) {
-        // named pipe
+    var parsedPort = parseInt(val, 10);
+    if (isNaN(parsedPort)) {
         return val;
     }
-    if (port >= 0) {
-        // port number
-        return port;
+    if (parsedPort >= 0) {
+        return parsedPort;
     }
     return false;
 }
@@ -101,7 +100,6 @@ function onError(error) {
 
     var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-    // handle specific listen errors with friendly messages
     switch (error.code) {
         case 'EACCES':
             console.error(bind + ' requires elevated privileges');
@@ -116,26 +114,31 @@ function onError(error) {
     }
 }
 
-// MongoDB Connection
 async function connectToMongoDB() {
     if (mongoose.connection.readyState !== 1) {
-        // Avoid multiple connections
         try {
             await mongoose.connect(process.env.MONGODB_URI);
-            console.log('✅ Connected to MongoDB Successfully');
+            console.log('Connected to MongoDB Successfully');
         } catch (err) {
-            console.error('❌ MongoDB connection error:', err);
+            console.error('MongoDB connection error:', err);
             process.exit(1);
         }
     }
 }
 
-// Start Server only once MongoDB is connected
-(async () => {
+async function startServer() {
     await connectToMongoDB();
-    app.listen(process.env.PORT || 3000, () =>
-        console.log(`🚀 Server is running on port ${process.env.PORT || 3000}`)
-    );
-})();
+    server = require('http').createServer(app);
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+}
+
+if (require.main === module) {
+    startServer().catch((err) => {
+        console.error('Server startup failed:', err);
+        process.exit(1);
+    });
+}
 
 module.exports = app;

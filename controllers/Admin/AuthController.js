@@ -18,7 +18,6 @@ const responseMessages = require('../../ResponseMessages');
 const jwtOptionsAccess = global.constants.jwtAccessTokenOptions;
 const jwtOptionsRefresh = global.constants.jwtRefreshTokenOptions;
 
-
 /*
 |------------------------------------------------ 
 | API name          :  newAdminCreate
@@ -222,16 +221,18 @@ module.exports.forgetPassword = (req, res) => {
                         </body>`
             }
 
-            // await axios.post(
-            //     `${process.env.FORGET_PASSWORD_SEND_GHL_URL}`,
-            //     mailData,
-            //     {
-            //         headers: {
-            //             "Content-Type": "application/json",
-            //             Accept: "application/json",
-            //         },
-            //     }
-            // );
+            if (process.env.FORGET_PASSWORD_SEND_GHL_URL) {
+                await axios.post(
+                    process.env.FORGET_PASSWORD_SEND_GHL_URL,
+                    mailData,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                    }
+                );
+            }
 
             return res.send({
                 status: 200,

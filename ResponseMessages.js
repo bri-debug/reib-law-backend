@@ -1,5 +1,5 @@
 module.exports = {
-    serverError: 'Something Went Wrong!!!',
+    serverError: 'Something Went Wrong!',
     duplicateEmail: "This Email Id has been already registered with us",
     registrationSuccess: "You have been registered successfully",
     profileDetails: "Your profile details has been added successfully",
