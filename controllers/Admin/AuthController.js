@@ -10,6 +10,7 @@ const { v7: uuidv7 } = require('uuid');
 
 // ################################ Model ################################ //
 const Admins = require('../../models/admins');
+const TeamMembers = require('../../models/teamMembers');
 
 // ################################ Response Messages ################################ //
 const responseMessages = require('../../ResponseMessages');
@@ -309,3 +310,158 @@ module.exports.resetPassword = (req, res) => {
         }
     })();
 }
+
+/*
+|------------------------------------------------ 
+| API name          :  getProfile
+| Response          :  Respective response message in JSON format
+| Logic             :  Fetch Logged In Admin Profile
+| Request URL       :  BASE_URL/admin/profile
+| Request method    :  GET
+|------------------------------------------------
+*/
+module.exports.getProfile = (req, res) => {
+    (async () => {
+        let purpose = 'Admin Profile';
+        try {
+            const adminID = req.headers.userID;
+            let adminDetails = await Admins.findOne({ _id: adminID, is_deleted: false });
+
+            if (!adminDetails) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.adminNotFound,
+                    data: {},
+                    purpose: purpose,
+                });
+            }
+
+            let responseData = adminDetails.toObject();
+            delete responseData.password;
+            delete responseData.otp;
+            delete responseData.otp_valid;
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.fetchAdminDetails,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Admin Profile Error : ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
+| API name          :  updateProfile
+| Response          :  Respective response message in JSON format
+| Logic             :  Update Logged In Admin Profile
+| Request URL       :  BASE_URL/admin/profile
+| Request method    :  PUT
+|------------------------------------------------
+*/
+module.exports.updateProfile = (req, res) => {
+    (async () => {
+        let purpose = 'Update Admin Profile';
+        try {
+            const adminID = req.headers.userID;
+            let body = req.body;
+            const normalizedEmail = body.email.trim().toLowerCase();
+
+            let duplicateAdmin = await Admins.findOne({
+                _id: { $ne: adminID },
+                email: normalizedEmail,
+                is_deleted: false,
+            });
+
+            if (duplicateAdmin) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.duplicateEmail,
+                    data: {},
+                    purpose: purpose,
+                });
+            }
+
+            await Admins.updateOne(
+                { _id: adminID, is_deleted: false },
+                {
+                    $set: {
+                        name: body.name.trim(),
+                        email: normalizedEmail,
+                        phone: body.phone.trim(),
+                        updatedAt: new Date(),
+                    },
+                }
+            );
+
+            let updatedAdmin = await Admins.findOne({ _id: adminID, is_deleted: false });
+            let responseData = updatedAdmin.toObject();
+            delete responseData.password;
+            delete responseData.otp;
+            delete responseData.otp_valid;
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.adminUpdate,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Update Admin Profile Error : ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
+| API name          :  listTeamMembers
+| Response          :  Respective response message in JSON format
+| Logic             :  Fetch Team Members
+| Request URL       :  BASE_URL/admin/team_members
+| Request method    :  GET
+|------------------------------------------------
+*/
+module.exports.listTeamMembers = (req, res) => {
+    (async () => {
+        let purpose = 'Team Members List';
+        try {
+            const teamMembers = await TeamMembers.find({ is_deleted: false }).sort({ createdAt: -1 });
+            const responseData = teamMembers.map((member) => {
+                const item = member.toObject();
+                delete item.password;
+                delete item.otp;
+                delete item.otp_valid;
+                return item;
+            });
+            return res.send({
+                status: 200,
+                msg: responseMessages.fetchAdminList,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Team Members List Error : ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};

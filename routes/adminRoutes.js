@@ -15,12 +15,18 @@ const workRequestValidationSchema = require('../validation-schema/Admin/WorkRequ
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/Admin/AuthController');
 const workRequestController = require('../controllers/Admin/WorkRequestController');
+const clientController = require('../controllers/Admin/ClientController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/admin_registration', validateRequest.validate(authValidationSchema.signupSchema, 'body'), authController.newAdminCreate); //Admin Registration
 router.post('/admin_login', validateRequest.validate(authValidationSchema.signinSchema, 'body'), authController.adminLogin); //Admin Login
 router.put('/admin_forget_password', validateRequest.validate(authValidationSchema.forgetPasswordSchema, 'body'), authController.forgetPassword); //Forget Password
 router.put('/admin_reset_password', validateRequest.validate(authValidationSchema.resetPasswordSchema, 'body'), authController.resetPassword); //Reset Password
+router.get('/profile', AuthenticationMiddlewares.authenticateAdminRequestAPI, authController.getProfile); //Admin Profile
+router.put('/profile', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(authValidationSchema.profileUpdateSchema, 'body'), authController.updateProfile); //Update Admin Profile
+router.get('/clients', AuthenticationMiddlewares.authenticateAdminRequestAPI, clientController.clientList); //Fetch Clients
+router.get('/client_details', AuthenticationMiddlewares.authenticateAdminRequestAPI, clientController.clientDetails); //Fetch Client Details
+// router.get('/team_members', AuthenticationMiddlewares.authenticateAdminRequestAPI, authController.listTeamMembers); //Fetch Team Members
 
 /* ############################################ Work Request ############################################ */
 router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.activeWorkRequestListSchema, 'query'), workRequestController.inProgressWorkRequestList); //Fetch Active New Work Request List

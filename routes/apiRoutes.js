@@ -26,6 +26,10 @@ router.post('/login', validateRequest.validate(authenticationSchema.signinSchema
 router.put('/forget_password', validateRequest.validate(authenticationSchema.forgetPasswordSchema, 'body'), authController.forgetPassword); //Forget Password
 router.put('/reset_password', validateRequest.validate(authenticationSchema.resetPasswordSchema, 'body'), authController.resetPassword); //Reset Password
 
+/* ############################################ Profile ############################################ */
+router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, authController.getProfile); //User Profile
+router.put('/profile', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.profileUpdateSchema, 'body'), authController.updateProfile); //Update User Profile
+
 /* ############################################ Work Request ############################################ */
 router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestCreateSchema, 'body'), workRequestController.createNewWorkRequest); //Create New Work Request
 router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.activeWorkRequestListSchema, 'query'), workRequestController.inProgressWorkRequestList); //Fetch Active New Work Request List

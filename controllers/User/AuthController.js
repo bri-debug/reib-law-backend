@@ -311,3 +311,119 @@ module.exports.resetPassword = (req, res) => {
         }
     })();
 }
+
+/*
+|------------------------------------------------ 
+| API name          :  getProfile
+| Response          :  Respective response message in JSON format
+| Logic             :  Fetch Logged In User Profile
+| Request URL       :  BASE_URL/api/profile
+| Request method    :  GET
+|------------------------------------------------
+*/
+module.exports.getProfile = (req, res) => {
+    (async () => {
+        let purpose = 'User Profile';
+        try {
+            const userID = req.headers.userID;
+            let userDetails = await Users.findOne({ _id: userID, is_deleted: false });
+
+            if (!userDetails) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.userNotFound,
+                    data: {},
+                    purpose: purpose,
+                });
+            }
+
+            let responseData = userDetails.toObject();
+            delete responseData.password;
+            delete responseData.otp;
+            delete responseData.otp_valid;
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.fetchUserDetails,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('User Profile Error : ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
+| API name          :  updateProfile
+| Response          :  Respective response message in JSON format
+| Logic             :  Update Logged In User Profile
+| Request URL       :  BASE_URL/api/profile
+| Request method    :  PUT
+|------------------------------------------------
+*/
+module.exports.updateProfile = (req, res) => {
+    (async () => {
+        let purpose = 'Update User Profile';
+        try {
+            const userID = req.headers.userID;
+            let body = req.body;
+
+            const normalizedEmail = body.email.trim().toLowerCase();
+            let duplicateUser = await Users.findOne({
+                _id: { $ne: userID },
+                email: normalizedEmail,
+                is_deleted: false,
+            });
+
+            if (duplicateUser) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.duplicateEmail,
+                    data: {},
+                    purpose: purpose,
+                });
+            }
+
+            await Users.updateOne(
+                { _id: userID, is_deleted: false },
+                {
+                    $set: {
+                        name: body.name.trim(),
+                        email: normalizedEmail,
+                        phone: body.phone.trim(),
+                        updatedAt: new Date(),
+                    },
+                }
+            );
+
+            let updatedUser = await Users.findOne({ _id: userID, is_deleted: false });
+            let responseData = updatedUser.toObject();
+            delete responseData.password;
+            delete responseData.otp;
+            delete responseData.otp_valid;
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.accountDetailsUpdate,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Update User Profile Error : ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
