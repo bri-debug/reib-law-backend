@@ -19,6 +19,7 @@ const workRequestValidationSchema = require('../validation-schema/User/WorkReque
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/User/AuthController');
 const workRequestController = require('../controllers/User/WorkRequestController');
+const resourceCenterController = require('../controllers/User/ResourceCenterController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/registration', validateRequest.validate(authenticationSchema.signupSchema, 'body'), authController.newUserCreate); //User Registration
@@ -35,6 +36,9 @@ router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateRe
 router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.activeWorkRequestListSchema, 'query'), workRequestController.inProgressWorkRequestList); //Fetch Active New Work Request List
 router.get('/completed_work_request_list', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.completedWorkRequestListSchema, 'query'), workRequestController.completedWorkRequestList); //Fetch Completed New Work Request List
 router.get('/work_request_details', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestDetailsSchema, 'query'), workRequestController.workRequestDetails); //Fetch Work Request Details
-router.post('/upload_work_doc', AuthenticationMiddlewares.authenticateRequestAPI, commonFunctions.uploadMultiple, workRequestController.uploadDoc); //Upload Document
+router.post('/upload_work_doc', AuthenticationMiddlewares.authenticateRequestAPI, commonFunctions.uploadMultiple, workRequestController.uploadDoc); //Upload Work Document
+
+/* ############################################ Resource Senter ############################################ */
+router.get('/template_list', AuthenticationMiddlewares.authenticateRequestAPI, resourceCenterController.templateList); //Upload Template Document
 
 module.exports = router;

@@ -195,19 +195,18 @@ exports.deleteLocalFile = (filePath) => {
 
 exports.uploadFile = async (filePath, file) => {
   try {
-    const params = {
+    const body = file.buffer || fs.createReadStream(file.path);
+    const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: filePath,
-      Body: fs.createReadStream(file.path),
+      Body: body,
       ContentType: file.mimetype,
     };
 
-    const response = await s3.send(new PutObjectCommand(params));
-
-    console.log("File uploaded successfully");
-    // console.log(response);
-    return `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${filePath}`;
+    await s3.send(new PutObjectCommand(uploadParams));
+    return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_DEFAULT_REGION_NAME}.amazonaws.com/${filePath}`;
   } catch (err) {
     console.error("Upload failed:", err);
+    throw err;
   }
 }

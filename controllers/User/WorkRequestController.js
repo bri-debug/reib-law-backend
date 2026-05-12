@@ -223,7 +223,7 @@ module.exports.workRequestDetails = (req, res) => {
 | API name          :  uploadDoc
 | Response          :  Respective response message in JSON format
 | Logic             :  Upload Documents
-| Request URL       :  BASE_URL/api/upload_doc
+| Request URL       :  BASE_URL/api/upload_work_doc
 | Request method    :  POST
 | Author            :  Mainak Saha
 |------------------------------------------------

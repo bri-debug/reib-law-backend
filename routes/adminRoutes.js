@@ -16,6 +16,7 @@ const workRequestValidationSchema = require('../validation-schema/Admin/WorkRequ
 const authController = require('../controllers/Admin/AuthController');
 const workRequestController = require('../controllers/Admin/WorkRequestController');
 const clientController = require('../controllers/Admin/ClientController');
+const resourceCenterController = require('../controllers/Admin/ResourceCenterController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/admin_registration', validateRequest.validate(authValidationSchema.signupSchema, 'body'), authController.newAdminCreate); //Admin Registration
@@ -33,6 +34,9 @@ router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticate
 router.get('/completed_work_request_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.completedWorkRequestListSchema, 'query'), workRequestController.completedWorkRequestList); //Fetch Completed New Work Request List
 router.get('/work_request_details', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestDetailsSchema, 'query'), workRequestController.workRequestDetails); //Fetch Work Request Details
 router.put('/assign_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestAssignSchema, 'body'), workRequestController.assignWorkRequest); //Work Request Assign
+
+/* ############################################ Resource Senter ############################################ */
+router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminRequestAPI, commonFunctions.uploadMultiple, resourceCenterController.uploadTemplateDoc); //Upload Template Document
 
 
 module.exports = router;
