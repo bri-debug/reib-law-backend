@@ -9,6 +9,9 @@ const { v7: uuidv7 } = require('uuid');
 // ################################ Model ################################ //
 const Users = require('../../models/users');
 
+/* ############################################ Helpers ############################################ */
+const commonFunctions = require('../../helpers/commonFunctions');
+
 // ################################ Response Messages ################################ //
 const responseMessages = require('../../ResponseMessages');
 

@@ -35,5 +35,6 @@ router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateRe
 router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.activeWorkRequestListSchema, 'query'), workRequestController.inProgressWorkRequestList); //Fetch Active New Work Request List
 router.get('/completed_work_request_list', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.completedWorkRequestListSchema, 'query'), workRequestController.completedWorkRequestList); //Fetch Completed New Work Request List
 router.get('/work_request_details', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestDetailsSchema, 'query'), workRequestController.workRequestDetails); //Fetch Work Request Details
+router.post('/upload_doc', AuthenticationMiddlewares.authenticateRequestAPI, commonFunctions.uploadMultiple, workRequestController.uploadDoc); //Upload Document
 
 module.exports = router;
