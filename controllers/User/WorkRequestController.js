@@ -233,6 +233,7 @@ module.exports.uploadDoc = (req, res) => {
         let purpose = 'Upload Documents';
         try {
             const uploadPromises = (req.files || [req.file]).map((reqFile) => {
+                console.log('reqFile : ', reqFile);
                 return new Promise((resolve, reject) => {
                     resolve(commonFunctions.uploadFile(`work_request_doc/${reqFile.originalname}`, reqFile));
                 });
