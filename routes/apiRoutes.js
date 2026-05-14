@@ -14,10 +14,12 @@ const commonFunctions = require('../helpers/commonFunctions');
 
 /* ############################################ Joi Validation Schema ################################## */
 const authenticationSchema = require('../validation-schema/User/AuthValidationSchema');
+const scheduleCallValidationSchema = require('../validation-schema/User/ScheduleCallValidationSchema');
 const workRequestValidationSchema = require('../validation-schema/User/WorkRequestValidationSchema');
 
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/User/AuthController');
+const scheduleCallController = require('../controllers/User/ScheduleCallController');
 const workRequestController = require('../controllers/User/WorkRequestController');
 const resourceCenterController = require('../controllers/User/ResourceCenterController');
 
@@ -30,6 +32,10 @@ router.put('/reset_password', validateRequest.validate(authenticationSchema.rese
 /* ############################################ Profile ############################################ */
 router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, authController.getProfile); //User Profile
 router.put('/profile', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.profileUpdateSchema, 'body'), authController.updateProfile); //Update User Profile
+
+/* ############################################ Check-In Call ############################################ */
+router.get('/check_in_call_availability', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(scheduleCallValidationSchema.availabilitySchema, 'query'), scheduleCallController.checkInCallAvailability); //Fetch Check-In Call Availability
+router.post('/schedule_check_in_call', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(scheduleCallValidationSchema.createScheduleCallSchema, 'body'), scheduleCallController.createCheckInCallBooking); //Create Check-In Call Booking
 
 /* ############################################ Work Request ############################################ */
 router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestCreateSchema, 'body'), workRequestController.createNewWorkRequest); //Create New Work Request
