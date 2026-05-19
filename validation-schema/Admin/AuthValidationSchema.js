@@ -13,7 +13,7 @@ module.exports.signupSchema = Joi.object().keys({
             'any.required': `"email" is a required field`,
             'string.pattern.base': `"email" should be in lowercase`,
         }),
-    phone: Joi.string().regex(/^[0-9]{10}$/).required(),
+    phone: Joi.string().required(),
     password: Joi.string().min(8).required(),
     confirm_password: Joi.string().valid(Joi.ref('password')).required(),
 });
@@ -61,5 +61,5 @@ module.exports.profileUpdateSchema = Joi.object().keys({
             'any.required': `"email" is a required field`,
             'string.pattern.base': `"email" should be in lowercase`,
         }),
-    phone: Joi.string().regex(/^[0-9]{10}$/).required(),
+    phone: Joi.string().required(),
 });
