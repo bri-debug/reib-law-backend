@@ -33,6 +33,7 @@ module.exports.userPlanDetails = (req, res) => {
 
             let userDetails = await Users.findOne({ _id: userID });
             let findPlanDetails = await Plans.findOne({ _id: userDetails?.plan ?? "6a0de5798837a31011e2031c" });
+            findPlanDetails.price = findPlanDetails.price[0];
 
             return res.send({
                 status: 200,
