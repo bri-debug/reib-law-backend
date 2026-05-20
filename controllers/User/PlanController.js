@@ -32,9 +32,11 @@ module.exports.userPlanDetails = (req, res) => {
             const userID = req.headers.userID;
 
             let userDetails = await Users.findOne({ _id: userID });
+            userDetails = userDetails.toObject();
             let findPlanDetails = await Plans.findOne({ _id: userDetails?.plan ?? "6a0de5798837a31011e2031c" });
+            findPlanDetails = findPlanDetails.toObject();
             findPlanDetails.price = findPlanDetails.price[0];
-
+            
             return res.send({
                 status: 200,
                 msg: responseMessages.planDetails,
