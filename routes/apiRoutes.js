@@ -22,6 +22,7 @@ const authController = require('../controllers/User/AuthController');
 const scheduleCallController = require('../controllers/User/ScheduleCallController');
 const workRequestController = require('../controllers/User/WorkRequestController');
 const resourceCenterController = require('../controllers/User/ResourceCenterController');
+const planController = require('../controllers/User/PlanController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/registration', validateRequest.validate(authenticationSchema.signupSchema, 'body'), authController.newUserCreate); //User Registration
@@ -46,5 +47,8 @@ router.post('/upload_work_doc', AuthenticationMiddlewares.authenticateRequestAPI
 
 /* ############################################ Resource Senter ############################################ */
 router.get('/template_list', AuthenticationMiddlewares.authenticateRequestAPI, resourceCenterController.templateList); //Upload Template Document
+
+/* ############################################ Plan ############################################ */
+router.get('/fetch_user_plan_details', AuthenticationMiddlewares.authenticateRequestAPI, planController.userPlanDetails); //Fetch User Plan Details
 
 module.exports = router;

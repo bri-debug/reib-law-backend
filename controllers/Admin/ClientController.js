@@ -11,7 +11,7 @@ function mapClientRecord(user, stats = {}, plan = {}) {
         phone: user.phone || '',
         status: user.status || (user.is_active ? 'active' : 'inactive'),
         company: user?.business_name ?? null,
-        plan: (plan.filter(f => f._id == user.plan).length) ? plan.filter(f => f._id == user.plan)[0].title : 'Guardian',
+        plan: (plan.filter(f => f._id == user?.plan).length) ? plan.filter(f => f._id == user.plan)[0].title : 'Guardian',
         requestCount: stats.requestCount || 0,
         completedCount: stats.completedCount || 0,
         createdAt: user.createdAt,

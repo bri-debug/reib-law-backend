@@ -114,5 +114,6 @@ module.exports = {
     planUpdate: "New Plan Has Been Updated Successfully",
     planDelete: "New Plan Has Been Deleted Successfully",
     planNotFound: "Plan Not Found",
+    planDetails: "Plan Details Has Been Fetched Successfully",
 
 }
