@@ -11,12 +11,14 @@ const commonFunctions = require('../helpers/commonFunctions');
 /* ############################################ Joi Validation Schema ################################## */
 const authValidationSchema = require('../validation-schema/Admin/AuthValidationSchema');
 const workRequestValidationSchema = require('../validation-schema/Admin/WorkRequestValidationSchema');
+const planValidationSchema = require('../validation-schema/Admin/PlanValidationSchema');
 
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/Admin/AuthController');
 const workRequestController = require('../controllers/Admin/WorkRequestController');
 const clientController = require('../controllers/Admin/ClientController');
 const resourceCenterController = require('../controllers/Admin/ResourceCenterController');
+const planController = require('../controllers/Admin/PlanController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/admin_registration', validateRequest.validate(authValidationSchema.signupSchema, 'body'), authController.newAdminCreate); //Admin Registration
@@ -38,5 +40,8 @@ router.put('/assign_work_request', AuthenticationMiddlewares.authenticateAdminRe
 /* ############################################ Resource Senter ############################################ */
 router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminRequestAPI, commonFunctions.uploadMultiple, resourceCenterController.uploadTemplateDoc); //Upload Template Document
 
+/* ############################################ Plan ############################################ */
+router.post('/plan_create', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planCreateSchema, 'body'), planController.newPlanCreate); //Create New Plan
+router.get('/fetch_plan_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, planController.planList); //Fetch Plan List
 
 module.exports = router;

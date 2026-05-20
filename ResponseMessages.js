@@ -107,6 +107,9 @@ module.exports = {
     workRequestNotRejectedToYou: "Work Request Not Rejected To You",
     workRequestNotPendingToYou: "Work Request Not Pending To You",
     workRequestNotInProgressToYou: "Work Request Not In Progress To You",
-    workRequestNotOnHoldToYou: "Work Request Not On Hold To"
+    workRequestNotOnHoldToYou: "Work Request Not On Hold To",
+    planCreate: "New Plan Has Been Created Successfully",
+    duplicatePlan: "This Plan already exist",
+    planList: "Plan List Has Been Fetched Successfully",
 
 }
