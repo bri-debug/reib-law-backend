@@ -1,16 +1,17 @@
 const Users = require('../../models/users');
+const Plans = require('../../models/plans');
 const RequestedWorks = require('../../models/requestedWorks');
 const responseMessages = require('../../ResponseMessages');
 
-function mapClientRecord(user, stats = {}) {
+function mapClientRecord(user, stats = {}, plan = {}) {
     return {
         _id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone || '',
         status: user.status || (user.is_active ? 'active' : 'inactive'),
-        company: user.email ? user.email.split('@')[1] : 'Client Account',
-        plan: 'Professional',
+        company: user?.business_name ?? null,
+        plan: (plan.filter(f => f._id == user.plan).length) ? plan.filter(f => f._id == user.plan)[0].title : 'Guardian',
         requestCount: stats.requestCount || 0,
         completedCount: stats.completedCount || 0,
         createdAt: user.createdAt,
@@ -38,6 +39,7 @@ module.exports.clientList = (req, res) => {
             }
 
             let clients = await Users.find(searchData).sort({ createdAt: -1 });
+            let findPlanList = await Plans.find({ is_deleted: false });
             let clientIds = clients.map((client) => client._id.toString());
             let workStats = await RequestedWorks.aggregate([
                 { $match: { user_id: { $in: clientIds }, is_deleted: false } },
@@ -62,7 +64,7 @@ module.exports.clientList = (req, res) => {
                 status: 200,
                 msg: responseMessages.userListFetch,
                 data: clients.map((client) =>
-                    mapClientRecord(client, statsMap.get(client._id.toString()))
+                    mapClientRecord(client, statsMap.get(client._id.toString()), findPlanList)
                 ),
                 purpose: purpose,
             });
