@@ -79,6 +79,67 @@ module.exports.newPlanCreate = (req, res) => {
 
 /*
 |------------------------------------------------ 
+| API name          :  newPlanUpdate
+| Response          :  Respective response message in JSON format
+| Logic             :  Update New Plan
+| Request URL       :  BASE_URL/admin/plan_update
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.newPlanUpdate = (req, res) => {
+    (async () => {
+        let purpose = 'Update New Plan';
+        try {
+            let body = req.body;
+
+            let findPlanInfo = await Plans.findOne({ _id: { $ne: body._id }, title: body.title });
+
+            if (findPlanInfo)
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.duplicatePlan,
+                    data: {},
+                    purpose: purpose,
+                });
+            
+            const planData = {
+                title: body.title,
+                description: body.description,
+                price: [
+                    {
+                        currency: 'usd',
+                        amount: body.amount,
+                        initiation_fee: body.initiation_fee,
+                        type: 'monthly'
+                    }
+                ],
+                benefits: body.benefits,
+                is_deleted: false,
+            };
+
+            await Plans.updateOne({ _id: body._id }, { $set: planData });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.planUpdate,
+                data: {},
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Update New Plan Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
 | API name          :  planList
 | Response          :  Respective response message in JSON format
 | Logic             :  Fetch Plan List

@@ -111,5 +111,6 @@ module.exports = {
     planCreate: "New Plan Has Been Created Successfully",
     duplicatePlan: "This Plan already exist",
     planList: "Plan List Has Been Fetched Successfully",
+    planUpdate: "New Plan Has Been Updated Successfully",
 
 }

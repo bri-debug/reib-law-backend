@@ -43,5 +43,6 @@ router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminR
 /* ############################################ Plan ############################################ */
 router.post('/plan_create', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planCreateSchema, 'body'), planController.newPlanCreate); //Create New Plan
 router.get('/fetch_plan_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, planController.planList); //Fetch Plan List
+router.put('/plan_update', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planUpdateSchema, 'body'), planController.newPlanUpdate); //Update Plan
 
 module.exports = router;
