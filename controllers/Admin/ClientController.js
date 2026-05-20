@@ -86,6 +86,7 @@ module.exports.clientDetails = (req, res) => {
         try {
             let query = req.query;
             let client = await Users.findOne({ _id: query.id, is_deleted: false });
+            let findPlanList = await Plans.find({ is_deleted: false });
 
             if (!client) {
                 return res.send({
@@ -121,7 +122,8 @@ module.exports.clientDetails = (req, res) => {
                     client: mapClientRecord(client, {
                         requestCount,
                         completedCount,
-                    }),
+                    },
+                        findPlanList),
                     workRequests,
                     deliverables: completedDeliverables,
                 },
