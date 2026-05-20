@@ -140,6 +140,52 @@ module.exports.newPlanUpdate = (req, res) => {
 
 /*
 |------------------------------------------------ 
+| API name          :  planDelete
+| Response          :  Respective response message in JSON format
+| Logic             :  Delete Plan
+| Request URL       :  BASE_URL/admin/plan_delete
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.planDelete = (req, res) => {
+    (async () => {
+        let purpose = 'Delete Plan';
+        try {
+            let body = req.body;
+
+            let findPlanInfo = await Plans.findOne({ _id: body._id, is_deleted: false });
+
+            if (!findPlanInfo)
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.planNotFound,
+                    data: {},
+                    purpose: purpose,
+                });
+
+            await Plans.updateOne({ _id: body._id }, { $set: { is_deleted: true } });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.planDelete,
+                data: {},
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Delete Plan Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
 | API name          :  planList
 | Response          :  Respective response message in JSON format
 | Logic             :  Fetch Plan List

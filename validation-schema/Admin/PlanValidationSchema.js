@@ -20,3 +20,8 @@ module.exports.planUpdateSchema = Joi.object().keys({
     initiation_fee: Joi.number().required(),
     benefits: Joi.array().empty(Joi.array().length(0)),
 });
+
+// plan delete validation
+module.exports.planDeleteSchema = Joi.object().keys({
+    _id: Joi.string().required(),
+});

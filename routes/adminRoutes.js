@@ -44,5 +44,6 @@ router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminR
 router.post('/plan_create', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planCreateSchema, 'body'), planController.newPlanCreate); //Create New Plan
 router.get('/fetch_plan_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, planController.planList); //Fetch Plan List
 router.put('/plan_update', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planUpdateSchema, 'body'), planController.newPlanUpdate); //Update Plan
+router.put('/plan_delete', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planDeleteSchema, 'body'), planController.planDelete); //Delete Plan
 
 module.exports = router;

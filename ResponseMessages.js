@@ -112,5 +112,7 @@ module.exports = {
     duplicatePlan: "This Plan already exist",
     planList: "Plan List Has Been Fetched Successfully",
     planUpdate: "New Plan Has Been Updated Successfully",
+    planDelete: "New Plan Has Been Deleted Successfully",
+    planNotFound: "Plan Not Found",
 
 }
