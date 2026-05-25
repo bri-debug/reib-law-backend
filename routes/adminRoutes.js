@@ -12,6 +12,7 @@ const commonFunctions = require('../helpers/commonFunctions');
 const authValidationSchema = require('../validation-schema/Admin/AuthValidationSchema');
 const workRequestValidationSchema = require('../validation-schema/Admin/WorkRequestValidationSchema');
 const planValidationSchema = require('../validation-schema/Admin/PlanValidationSchema');
+const supportValidationSchema = require('../validation-schema/Admin/SupportValidationSchema');
 
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/Admin/AuthController');
@@ -19,6 +20,7 @@ const workRequestController = require('../controllers/Admin/WorkRequestControlle
 const clientController = require('../controllers/Admin/ClientController');
 const resourceCenterController = require('../controllers/Admin/ResourceCenterController');
 const planController = require('../controllers/Admin/PlanController');
+const supportController = require('../controllers/Admin/SupportController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/admin_registration', validateRequest.validate(authValidationSchema.signupSchema, 'body'), authController.newAdminCreate); //Admin Registration
@@ -45,5 +47,10 @@ router.post('/plan_create', AuthenticationMiddlewares.authenticateAdminRequestAP
 router.get('/fetch_plan_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, planController.planList); //Fetch Plan List
 router.put('/plan_update', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planUpdateSchema, 'body'), planController.newPlanUpdate); //Update Plan
 router.put('/plan_delete', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(planValidationSchema.planDeleteSchema, 'body'), planController.planDelete); //Delete Plan
+
+/* ############################################ Support ############################################ */
+router.get('/support_conversations', AuthenticationMiddlewares.authenticateAdminRequestAPI, supportController.supportConversationList); //Fetch Support Conversation List
+router.get('/support_messages', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(supportValidationSchema.supportThreadSchema, 'query'), supportController.supportMessages); //Fetch Support Messages
+router.post('/support_messages', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(supportValidationSchema.sendSupportMessageSchema, 'body'), supportController.sendSupportMessage); //Send Support Message
 
 module.exports = router;

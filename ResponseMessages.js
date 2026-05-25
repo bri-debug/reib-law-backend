@@ -115,5 +115,8 @@ module.exports = {
     planDelete: "New Plan Has Been Deleted Successfully",
     planNotFound: "Plan Not Found",
     planDetails: "Plan Details Has Been Fetched Successfully",
+    supportConversationListFetched: "Support conversation list has been fetched successfully",
+    supportThreadFetched: "Support messages have been fetched successfully",
+    supportMessageSent: "Support message has been sent successfully",
 
 }

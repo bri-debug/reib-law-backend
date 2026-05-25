@@ -1,0 +1,182 @@
+const Users = require('../../models/users');
+const SupportConversation = require('../../models/supportConversations');
+const SupportMessage = require('../../models/supportMessages');
+const responseMessages = require('../../ResponseMessages');
+
+function mapMessage(messageDoc) {
+    return {
+        _id: messageDoc._id,
+        conversation_id: messageDoc.conversation_id,
+        sender: messageDoc.sender_role,
+        sender_id: messageDoc.sender_id,
+        name: messageDoc.sender_name,
+        text: messageDoc.message,
+        importance: messageDoc.importance,
+        createdAt: messageDoc.createdAt,
+        updatedAt: messageDoc.updatedAt,
+    };
+}
+
+function mapConversation(conversationDoc, user) {
+    return {
+        _id: conversationDoc?._id || null,
+        client_id: user._id,
+        client_name: user.name,
+        client_email: user.email,
+        last_message: conversationDoc?.last_message || '',
+        last_message_sender: conversationDoc?.last_message_sender || null,
+        last_message_importance: conversationDoc?.last_message_importance || 'normal',
+        last_message_at: conversationDoc?.last_message_at || null,
+        unread_for_client: conversationDoc?.unread_for_client || 0,
+        unread_for_admin: conversationDoc?.unread_for_admin || 0,
+        has_urgent: conversationDoc?.has_urgent || false,
+        createdAt: conversationDoc?.createdAt || null,
+        updatedAt: conversationDoc?.updatedAt || null,
+    };
+}
+
+async function findUserOrSendNotFound(res, userID, purpose) {
+    const user = await Users.findOne({ _id: userID, is_deleted: false, is_active: true });
+
+    if (!user) {
+        res.send({
+            status: 404,
+            msg: responseMessages.userNotFound,
+            data: {},
+            purpose,
+        });
+        return null;
+    }
+
+    return user;
+}
+
+module.exports.supportMessages = (req, res) => {
+    (async () => {
+        const purpose = 'Fetch Support Messages';
+        try {
+            const userID = req.headers.userID;
+            const user = await findUserOrSendNotFound(res, userID, purpose);
+
+            if (!user) return;
+
+            const conversation = await SupportConversation.findOne({
+                user_id: userID,
+                is_deleted: false,
+            });
+
+            const messages = conversation
+                ? await SupportMessage.find({
+                    conversation_id: conversation._id,
+                    is_deleted: false,
+                }).sort({ createdAt: 1 })
+                : [];
+
+            if (conversation && conversation.unread_for_client > 0) {
+                await SupportConversation.updateOne(
+                    { _id: conversation._id },
+                    {
+                        unread_for_client: 0,
+                        updatedAt: new Date(),
+                    },
+                );
+            }
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.supportThreadFetched,
+                data: {
+                    conversation: mapConversation(conversation, user),
+                    messages: messages.map(mapMessage),
+                },
+                purpose,
+            });
+        } catch (err) {
+            console.log('Fetch Support Messages Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose,
+            });
+        }
+    })();
+};
+
+module.exports.sendSupportMessage = (req, res) => {
+    (async () => {
+        const purpose = 'Send Support Message';
+        try {
+            const userID = req.headers.userID;
+            const body = req.body;
+            const user = await findUserOrSendNotFound(res, userID, purpose);
+
+            if (!user) return;
+
+            let conversation = await SupportConversation.findOne({
+                user_id: userID,
+                is_deleted: false,
+            });
+
+            if (!conversation) {
+                conversation = await SupportConversation.create({
+                    user_id: userID,
+                    client_name: user.name,
+                    client_email: user.email,
+                    last_message: '',
+                    last_message_at: new Date(),
+                    last_message_sender: 'client',
+                    last_message_importance: body.importance || 'normal',
+                    unread_for_admin: 0,
+                    unread_for_client: 0,
+                    has_urgent: false,
+                    is_deleted: false,
+                });
+            }
+
+            const createdMessage = await SupportMessage.create({
+                conversation_id: conversation._id,
+                user_id: userID,
+                sender_role: 'client',
+                sender_id: userID,
+                sender_name: user.name,
+                message: body.message.trim(),
+                importance: body.importance || 'normal',
+                is_deleted: false,
+            });
+
+            const nextUnreadForAdmin = (conversation.unread_for_admin || 0) + 1;
+            const isUrgentMessage = createdMessage.importance === 'urgent';
+
+            await SupportConversation.updateOne(
+                { _id: conversation._id },
+                {
+                    client_name: user.name,
+                    client_email: user.email,
+                    last_message: createdMessage.message,
+                    last_message_sender: 'client',
+                    last_message_importance: createdMessage.importance,
+                    last_message_at: createdMessage.createdAt,
+                    unread_for_admin: nextUnreadForAdmin,
+                    has_urgent: isUrgentMessage,
+                    updatedAt: new Date(),
+                },
+            );
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.supportMessageSent,
+                data: mapMessage(createdMessage),
+                purpose,
+            });
+        } catch (err) {
+            console.log('Send Support Message Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose,
+            });
+        }
+    })();
+};

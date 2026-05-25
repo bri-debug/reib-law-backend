@@ -16,6 +16,7 @@ const commonFunctions = require('../helpers/commonFunctions');
 const authenticationSchema = require('../validation-schema/User/AuthValidationSchema');
 const scheduleCallValidationSchema = require('../validation-schema/User/ScheduleCallValidationSchema');
 const workRequestValidationSchema = require('../validation-schema/User/WorkRequestValidationSchema');
+const supportValidationSchema = require('../validation-schema/User/SupportValidationSchema');
 
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/User/AuthController');
@@ -23,6 +24,7 @@ const scheduleCallController = require('../controllers/User/ScheduleCallControll
 const workRequestController = require('../controllers/User/WorkRequestController');
 const resourceCenterController = require('../controllers/User/ResourceCenterController');
 const planController = require('../controllers/User/PlanController');
+const supportController = require('../controllers/User/SupportController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/registration', validateRequest.validate(authenticationSchema.signupSchema, 'body'), authController.newUserCreate); //User Registration
@@ -50,5 +52,9 @@ router.get('/template_list', AuthenticationMiddlewares.authenticateRequestAPI, r
 
 /* ############################################ Plan ############################################ */
 router.get('/fetch_user_plan_details', AuthenticationMiddlewares.authenticateRequestAPI, planController.userPlanDetails); //Fetch User Plan Details
+
+/* ############################################ Support ############################################ */
+router.get('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, supportController.supportMessages); //Fetch Support Messages
+router.post('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(supportValidationSchema.sendSupportMessageSchema, 'body'), supportController.sendSupportMessage); //Send Support Message
 
 module.exports = router;
