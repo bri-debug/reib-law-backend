@@ -214,7 +214,7 @@ module.exports.forgetPassword = (req, res) => {
                                                 immediately. You can also reach us by responding to this email.</p>
                                             <p style="font-size:17px; font-weight:500; color:#000; line-height:24px; margin-top: 20px;">Thanks for your time,</p>
                                             <p style="font-size:17px; font-weight:500; color:#000; line-height:24px; margin-top: 5px; font-weight: bold;">
-                                                Reinstate Elite</p>
+                                                Reib Law</p>
                                         </th>
                                     </tr>
                                 </table>
