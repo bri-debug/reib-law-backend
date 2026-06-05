@@ -226,7 +226,7 @@ module.exports.sendSupportMessage = (req, res) => {
                 sender: 'admin',
             };
 
-            io.to(`user:${userId}`).emit(
+            io.to(`user:${body.client_id}`).emit(
                 "receive_message",
                 message
             );
