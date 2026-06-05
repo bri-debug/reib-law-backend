@@ -2,6 +2,7 @@ const Users = require('../../models/users');
 const SupportConversation = require('../../models/supportConversations');
 const SupportMessage = require('../../models/supportMessages');
 const responseMessages = require('../../ResponseMessages');
+const { getIO } = require("../../helpers/socketFunctions");
 
 function mapMessage(messageDoc) {
     return {
@@ -162,6 +163,16 @@ module.exports.sendSupportMessage = (req, res) => {
                     updatedAt: new Date(),
                 },
             );
+            
+            const io = getIO();
+
+            const message = {
+                conversationID: conversation._id,
+                message: mapMessage(createdMessage),
+                sender: 'client',
+            };
+
+            io.to("admins").emit("receive_message", message);
 
             return res.send({
                 status: 200,

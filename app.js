@@ -47,9 +47,13 @@ global.constants = require(global.appPath + '/config/constants');
 
 var apiRouter = require('./routes/apiRoutes');
 var adminRouter = require('./routes/adminRoutes');
+var socketFunc = require("./helpers/socketFunctions"); // SOCKET Routes
+
 var port = normalizePort(process.env.PORT || '4078');
 
 app.set('port', port);
+
+// Socket and server setup is handled in startServer()
 
 function InterceptorForAllResponse(req, res, next) {
     var oldSend = res.send;
@@ -129,6 +133,11 @@ async function connectToMongoDB() {
 async function startServer() {
     await connectToMongoDB();
     server = require('http').createServer(app);
+    const { initializeSocket } = require("./helpers/socketFunctions");
+
+    // Socket Configuration
+    initializeSocket(server);
+
     server.listen(port);
     server.on('error', onError);
     server.on('listening', onListening);
