@@ -245,7 +245,7 @@ module.exports.createNewWorkRequest = (req, res) => {
             let body = req.body;
 
             const submitData = {
-                user_id: body.userID,
+                user_id: body.user_id,
                 type: body.type,
                 title: body.title,
                 description: body.description,
