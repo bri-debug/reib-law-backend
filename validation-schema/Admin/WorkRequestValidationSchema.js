@@ -39,6 +39,6 @@ module.exports.workRequestCreateSchema = Joi.object().keys({
     sla: Joi.string().required(),
     priority: Joi.string().required(),
     files: Joi.array().empty(Joi.array().length(0)),
-    tags: Joi.string().required(),
+    tags: Joi.array().empty(Joi.array().length(0)),
     status: Joi.string().valid('active', 'completed').required(),
 });
