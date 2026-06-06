@@ -249,7 +249,7 @@ module.exports.createNewWorkRequest = (req, res) => {
                 type: body.type,
                 title: body.title,
                 description: body.description,
-                client_name: body.name,
+                client_name: body.client_name,
                 email: body.email,
                 phone: body.phone,
                 sla: body.sla,
