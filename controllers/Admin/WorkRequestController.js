@@ -281,3 +281,43 @@ module.exports.createNewWorkRequest = (req, res) => {
         }
     })();
 };
+
+/*
+|------------------------------------------------ 
+| API name          :  uploadDoc
+| Response          :  Respective response message in JSON format
+| Logic             :  Upload Documents
+| Request URL       :  BASE_URL/admin/upload_work_doc
+| Request method    :  POST
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.uploadDoc = (req, res) => {
+    (async () => {
+        let purpose = 'Upload Documents';
+        try {
+            const uploadPromises = (req.files || [req.file]).map((reqFile) => {
+                return new Promise((resolve, reject) => {
+                    resolve(commonFunctions.uploadFile(`work_request_doc/${reqFile.originalname}`, reqFile));
+                });
+            });
+
+            const urls = await Promise.all(uploadPromises);
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.fileUpload,
+                data: urls,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Upload Documents Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
