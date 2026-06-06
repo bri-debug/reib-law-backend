@@ -227,3 +227,57 @@ module.exports.assignWorkRequest = (req, res) => {
         }
     })();
 };
+
+/*
+|------------------------------------------------ 
+| API name          :  createNewWorkRequest
+| Response          :  Respective response message in JSON format
+| Logic             :  Create New Work Request
+| Request URL       :  BASE_URL/admin/create_new_work_request
+| Request method    :  POST
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.createNewWorkRequest = (req, res) => {
+    (async () => {
+        let purpose = 'Create New Work Request';
+        try {
+            let body = req.body;
+
+            const submitData = {
+                user_id: body.userID,
+                type: body.type,
+                title: body.title,
+                description: body.description,
+                client_name: body.name,
+                email: body.email,
+                phone: body.phone,
+                sla: body.sla,
+                priority: body.priority,
+                files: body.files,
+                tags: body.tags,
+                status: body.status,
+                is_deleted: false,
+            };
+
+            let createdWorkRequest = await RequestedWorks.create(submitData);
+
+            let responseData = createdWorkRequest.toObject();
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.workRequestCreate,
+                data: responseData,
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Create New Work Request Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};

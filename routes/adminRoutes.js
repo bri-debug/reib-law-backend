@@ -38,6 +38,7 @@ router.get('/progress_work_request_list', AuthenticationMiddlewares.authenticate
 router.get('/completed_work_request_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.completedWorkRequestListSchema, 'query'), workRequestController.completedWorkRequestList); //Fetch Completed New Work Request List
 router.get('/work_request_details', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestDetailsSchema, 'query'), workRequestController.workRequestDetails); //Fetch Work Request Details
 router.put('/assign_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestAssignSchema, 'body'), workRequestController.assignWorkRequest); //Work Request Assign
+router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestCreateSchema, 'body'), workRequestController.createNewWorkRequest); //Create New Work Request
 
 /* ############################################ Resource Senter ############################################ */
 router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminRequestAPI, commonFunctions.uploadMultiple, resourceCenterController.uploadTemplateDoc); //Upload Template Document
