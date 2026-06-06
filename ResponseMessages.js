@@ -118,5 +118,6 @@ module.exports = {
     supportConversationListFetched: "Support conversation list has been fetched successfully",
     supportThreadFetched: "Support messages have been fetched successfully",
     supportMessageSent: "Support message has been sent successfully",
+    adminList: "Admin List Has Been Fetched Successfully",
 
 }

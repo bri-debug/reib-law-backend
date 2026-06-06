@@ -21,6 +21,7 @@ const clientController = require('../controllers/Admin/ClientController');
 const resourceCenterController = require('../controllers/Admin/ResourceCenterController');
 const planController = require('../controllers/Admin/PlanController');
 const supportController = require('../controllers/Admin/SupportController');
+const adminController = require('../controllers/Admin/AdminController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/admin_registration', validateRequest.validate(authValidationSchema.signupSchema, 'body'), authController.newAdminCreate); //Admin Registration
@@ -54,5 +55,8 @@ router.put('/plan_delete', AuthenticationMiddlewares.authenticateAdminRequestAPI
 router.get('/support_conversations', AuthenticationMiddlewares.authenticateAdminRequestAPI, supportController.supportConversationList); //Fetch Support Conversation List
 router.get('/support_messages', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(supportValidationSchema.supportThreadSchema, 'query'), supportController.supportMessages); //Fetch Support Messages
 router.post('/support_messages', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(supportValidationSchema.sendSupportMessageSchema, 'body'), supportController.sendSupportMessage); //Send Support Message
+
+/* ############################################ Plan ############################################ */
+router.get('/fetch_admin_list', AuthenticationMiddlewares.authenticateAdminRequestAPI, adminController.adminList); //Fetch Admin List
 
 module.exports = router;
