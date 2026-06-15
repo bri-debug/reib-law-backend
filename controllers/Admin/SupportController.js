@@ -1,5 +1,6 @@
 const Users = require('../../models/users');
 const Admins = require('../../models/admins');
+const Workspaces = require('../../models/workspaces');
 const SupportConversation = require('../../models/supportConversations');
 const SupportMessage = require('../../models/supportMessages');
 const responseMessages = require('../../ResponseMessages');
@@ -84,9 +85,27 @@ module.exports.supportMessages = (req, res) => {
         const purpose = 'Fetch Support Messages';
         try {
             const query = req.query;
-            // const client = await findClientOrSendNotFound(res, query.client_id, purpose);
+            const workspaceDetails = await Workspaces.findById(query.workspace_id);
 
-            // if (!client) return;
+            if (!workspaceDetails) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.workspaceNotFound,
+                    data: {},
+                    purpose,
+                });
+            }
+            
+            const client = await Users.findOne({ _id: workspaceDetails.owner_id, is_deleted: false });
+
+            if (!client) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.userNotFound,
+                    data: {},
+                    purpose,
+                });
+            }
 
             const conversation = await SupportConversation.findOne({
                 workspace_id: query.workspace_id,
@@ -164,9 +183,27 @@ module.exports.sendSupportMessage = (req, res) => {
                 });
             }
 
-            // const client = await findClientOrSendNotFound(res, body.client_id, purpose);
+            const workspaceDetails = await Workspaces.findById(query.workspace_id);
 
-            // if (!client) return;
+            if (!workspaceDetails) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.workspaceNotFound,
+                    data: {},
+                    purpose,
+                });
+            }
+            
+            const client = await Users.findOne({ _id: workspaceDetails.owner_id, is_deleted: false });
+
+            if (!client) {
+                return res.send({
+                    status: 404,
+                    msg: responseMessages.userNotFound,
+                    data: {},
+                    purpose,
+                });
+            }
 
             let conversation = await SupportConversation.findOne({
                 workspace_id: body.workspace_id,
@@ -206,8 +243,8 @@ module.exports.sendSupportMessage = (req, res) => {
             await SupportConversation.updateOne(
                 { _id: conversation._id },
                 {
-                    // client_name: client.name,
-                    // client_email: client.email,
+                    client_name: client.name,
+                    client_email: client.email,
                     last_message: createdMessage.message,
                     last_message_sender: 'admin',
                     last_message_importance: createdMessage.importance,

@@ -119,5 +119,6 @@ module.exports = {
     supportThreadFetched: "Support messages have been fetched successfully",
     supportMessageSent: "Support message has been sent successfully",
     adminList: "Admin List Has Been Fetched Successfully",
+    workspaceNotFound: "Workspace Is Not Present",
 
 }
