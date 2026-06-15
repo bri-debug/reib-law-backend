@@ -4,6 +4,7 @@ const Joi = JoiBase.extend(JoiDate); // extend Joi with Joi Date
 
 // work request create validation schema
 module.exports.workRequestCreateSchema = Joi.object().keys({
+    workspace_id: Joi.string().required(),
     type: Joi.string().required(),
     title: Joi.string().required(),
     description: Joi.string().required(),
@@ -17,6 +18,7 @@ module.exports.workRequestCreateSchema = Joi.object().keys({
 
 // active work request list validation schema
 module.exports.activeWorkRequestListSchema = Joi.object().keys({
+    workspace_id: Joi.string().required(),
     search: Joi.string().allow('', null),
     status: Joi.string().allow('', null),
     lastID: Joi.string().allow('', null),
@@ -24,6 +26,7 @@ module.exports.activeWorkRequestListSchema = Joi.object().keys({
 
 // completed work request list validation schema
 module.exports.completedWorkRequestListSchema = Joi.object().keys({
+    workspace_id: Joi.string().required(),
     search: Joi.string().allow('', null),
     status: Joi.string().allow('', null),
     lastID: Joi.string().allow('', null),
@@ -32,4 +35,5 @@ module.exports.completedWorkRequestListSchema = Joi.object().keys({
 // work request details validation schema
 module.exports.workRequestDetailsSchema = Joi.object().keys({
     id: Joi.string().required(),
+    workspace_id: Joi.string().required(),
 });

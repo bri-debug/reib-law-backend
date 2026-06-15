@@ -57,12 +57,13 @@ module.exports.supportMessages = (req, res) => {
         const purpose = 'Fetch Support Messages';
         try {
             const userID = req.headers.userID;
+            const query = req.query;
             const user = await findUserOrSendNotFound(res, userID, purpose);
 
             if (!user) return;
 
             const conversation = await SupportConversation.findOne({
-                user_id: userID,
+                workspace_id: query.workspace_id,
                 is_deleted: false,
             });
 
@@ -115,13 +116,13 @@ module.exports.sendSupportMessage = (req, res) => {
             if (!user) return;
 
             let conversation = await SupportConversation.findOne({
-                user_id: userID,
+                workspace_id: body.workspace_id,
                 is_deleted: false,
             });
 
             if (!conversation) {
                 conversation = await SupportConversation.create({
-                    user_id: userID,
+                    workspace_id: body.workspace_id,
                     client_name: user.name,
                     client_email: user.email,
                     last_message: '',

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const SupportConversationSchema = new mongoose.Schema({
-    user_id: { type: String, required: true, unique: true },
+    workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
     client_name: { type: String, required: true },
     client_email: { type: String, required: true },
     last_message: { type: String, default: '' },
@@ -11,9 +11,9 @@ const SupportConversationSchema = new mongoose.Schema({
     unread_for_admin: { type: Number, default: 0 },
     unread_for_client: { type: Number, default: 0 },
     has_urgent: { type: Boolean, default: false },
-    is_deleted: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    is_deleted: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 const SupportConversation = mongoose.model('SupportConversation', SupportConversationSchema);

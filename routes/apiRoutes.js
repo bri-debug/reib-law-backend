@@ -54,7 +54,7 @@ router.get('/template_list', AuthenticationMiddlewares.authenticateRequestAPI, r
 router.get('/fetch_user_plan_details', AuthenticationMiddlewares.authenticateRequestAPI, planController.userPlanDetails); //Fetch User Plan Details
 
 /* ############################################ Support ############################################ */
-router.get('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, supportController.supportMessages); //Fetch Support Messages
+router.get('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(supportValidationSchema.showSupportMessageSchema, 'query'), supportController.supportMessages); //Fetch Support Messages
 router.post('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(supportValidationSchema.sendSupportMessageSchema, 'body'), supportController.sendSupportMessage); //Send Support Message
 
 module.exports = router;

@@ -8,6 +8,8 @@ const { v7: uuidv7 } = require('uuid');
 
 // ################################ Model ################################ //
 const Users = require('../../models/users');
+const Workspaces = require('../../models/workspaces');
+const WorkspaceMembers = require('../../models/workspaceMembers');
 
 /* ############################################ Helpers ############################################ */
 const commonFunctions = require('../../helpers/commonFunctions');
@@ -59,6 +61,20 @@ module.exports.newUserCreate = (req, res) => {
             };
 
             let userCreateDetails = await Users.create(userData);
+            let workspaceCreateDetails = await Workspaces.create({
+                name: `${userCreateDetails.name.split(' ')[0]}'s Workspace`,
+                owner_id: userCreateDetails._id
+            });
+            let workspaceMemberCreateDetails = await WorkspaceMembers.create({
+                workspace_id: workspaceCreateDetails._id,
+                user_id: userCreateDetails._id,
+                role: 'owner',
+                permissions: {
+                    create_work_request: true,
+                    chat_support: true,
+                    manage_members: true
+                }
+            });
 
             let accessToken = jwt.sign({ user_id: userCreateDetails._id }, jwtOptionsAccess.secret, jwtOptionsAccess.options);
             let refreshToken = jwt.sign({ user_id: userCreateDetails._id }, jwtOptionsRefresh.secret, jwtOptionsRefresh.options);
@@ -66,9 +82,9 @@ module.exports.newUserCreate = (req, res) => {
             let responseData = userCreateDetails.toObject();
             responseData.access_token = accessToken;
             responseData.refresh_token = refreshToken;
-            
+
             delete responseData.password;
-            
+
             return res.send({
                 status: 200,
                 msg: responseMessages.registrationSuccess,
@@ -120,12 +136,36 @@ module.exports.userLogin = (req, res) => {
             ).toString(CryptoJS.enc.Utf8);
 
             if (body.password == password) {
+                const workspaceDetails = await WorkspaceMembers.aggregate([
+                    {
+                        $match: { user_id: userDetails._id }
+                    },
+                    {
+                        $lookup: {
+                            from: "workspaces",
+                            localField: "workspace_id",
+                            foreignField: "_id",
+                            as: "workspaceDetails"
+                        }
+                    },
+                    {
+                        $unwind: "$workspaceDetails"
+                    },
+                    {
+                        $project: {
+                            _id: "$workspaceDetails._id",
+                            name: "$workspaceDetails.name"
+                        }
+                    }
+                ]);
+                
                 let accessToken = jwt.sign({ user_id: userDetails._id }, jwtOptionsAccess.secret, jwtOptionsAccess.options);
                 let refreshToken = jwt.sign({ user_id: userDetails._id }, jwtOptionsRefresh.secret, jwtOptionsRefresh.options);
 
                 let responseData = userDetails.toObject();
                 responseData.access_token = accessToken;
                 responseData.refresh_token = refreshToken;
+                responseData.workspaces = workspaceDetails;
 
                 delete responseData.password;
                 delete responseData.payment_intent_id;
@@ -174,7 +214,7 @@ module.exports.forgetPassword = (req, res) => {
         let purpose = "Forget Password";
         try {
             let body = req.body;
-            
+
             let userDetails = await Users.findOne({ email: body.email, is_deleted: false });
 
             if (!userDetails) {
@@ -196,7 +236,7 @@ module.exports.forgetPassword = (req, res) => {
             const otpValue = Math.floor(1000 + Math.random() * 9000);
             const now = Math.floor(Date.now() / 1000);
             const fiveMinFromNow = now + (5 * 60);
-            
+
             await Users.updateOne({ _id: userDetails._id }, { $set: { otp: otpValue, otp_valid: fiveMinFromNow } });
 
             let mailData = {
@@ -277,7 +317,7 @@ module.exports.resetPassword = (req, res) => {
             if (userDetails) {
                 const now = Math.floor(Date.now() / 1000);
                 const otpValidTime = userDetails.otp_valid;
-                
+
                 if (otpValidTime < now)
                     return res.send({
                         status: 404,
@@ -285,7 +325,7 @@ module.exports.resetPassword = (req, res) => {
                         data: {},
                         purpose: purpose
                     })
-                
+
                 const newPassword = CryptoJS.AES.encrypt(body.password, global.constants.passCode_for_password).toString();
                 await Users.updateOne({ _id: userDetails._id }, { $set: { otp: null, otp_valid: null, password: newPassword } });
 

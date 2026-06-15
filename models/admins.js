@@ -9,9 +9,9 @@ const AdminSchema = new mongoose.Schema({
     otp: Number,
     otp_valid: Number,
     is_active: { type: Boolean, default: true },
-    is_deleted: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    is_deleted: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 const Admin = mongoose.model('Admin', AdminSchema);

@@ -1,11 +1,13 @@
 // ################################ NPM Packages ################################ //
 const moment = require('moment');
+const mongoose = require('mongoose');
 
 /* ############################################ Helpers ############################################ */
 const commonFunctions = require('../../helpers/commonFunctions');
 
 // ################################ Model ################################ //
 const RequestedWorks = require('../../models/requestedWorks');
+const Users = require('../../models/users');
 
 // ################################ Response Messages ################################ //
 const responseMessages = require('../../ResponseMessages');
@@ -28,7 +30,8 @@ module.exports.createNewWorkRequest = (req, res) => {
             let body = req.body;
 
             const submitData = {
-                user_id: userID,
+                created_by: userID,
+                workspace_id: body.workspace_id,
                 type: body.type,
                 title: body.title,
                 description: body.description,
@@ -81,7 +84,7 @@ module.exports.inProgressWorkRequestList = (req, res) => {
             const userID = req.headers.userID;
             let query = req.query;
             const limit = 25;
-            let searchData = { user_id: userID, status: { $ne: "completed" }, is_deleted: false };
+            let searchData = { workspace_id: new mongoose.Types.ObjectId(query.workspace_id), status: { $ne: "completed" }, is_deleted: false };
 
             if (query.status && query.status != '') searchData.status = query.status;
             if (query.search && query.search != '') searchData.$or = [{ title: { $regex: query.search, $options: 'i' } }, { description: { $regex: query.search, $options: 'i' } }];
@@ -90,8 +93,41 @@ module.exports.inProgressWorkRequestList = (req, res) => {
 
             if (query.lastID)
                 searchData._id = { $gt: query.lastID };
-
-            let inProgressWorkRequestList = await RequestedWorks.find(searchData).sort({ _id: 1 }).limit(limit);
+            
+            // let inProgressWorkRequestList = await RequestedWorks.find(searchData).sort({ _id: 1 }).limit(limit);
+            let inProgressWorkRequestList = await RequestedWorks.aggregate([
+                {
+                    $match: searchData
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "created_by",
+                        foreignField: "_id",
+                        pipeline: [
+                            {
+                                $project: {
+                                    _id: 1,
+                                    name: 1,
+                                    email: 1
+                                }
+                            }
+                        ],
+                        as: "created_by"
+                    }
+                },
+                {
+                    $unwind: "$created_by"
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
+                },
+                {
+                    $limit: limit
+                }
+            ]);
 
             let responseData = inProgressWorkRequestList;
 
@@ -135,7 +171,7 @@ module.exports.completedWorkRequestList = (req, res) => {
             const userID = req.headers.userID;
             let query = req.query;
             const limit = 25;
-            let searchData = { user_id: userID, status: { $eq: "completed" }, is_deleted: false };
+            let searchData = { workspace_id: new mongoose.Types.ObjectId(query.workspace_id), status: { $eq: "completed" }, is_deleted: false };
 
             if (query.status && query.status != '') searchData.status = query.status;
             if (query.search && query.search != '') searchData.$or = [{ title: { $regex: query.search, $options: 'i' } }, { description: { $regex: query.search, $options: 'i' } }];
@@ -145,9 +181,42 @@ module.exports.completedWorkRequestList = (req, res) => {
             if (query.lastID)
                 searchData._id = { $gt: query.lastID };
 
-            let inProgressWorkRequestList = await RequestedWorks.find(searchData).sort({ _id: 1 }).limit(limit);
+            // let completedWorkRequestList = await RequestedWorks.find(searchData).sort({ _id: 1 }).limit(limit);
+            let completedWorkRequestList = await RequestedWorks.aggregate([
+                {
+                    $match: searchData
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "created_by",
+                        foreignField: "_id",
+                        pipeline: [
+                            {
+                                $project: {
+                                    _id: 1,
+                                    name: 1,
+                                    email: 1
+                                }
+                            }
+                        ],
+                        as: "created_by"
+                    }
+                },
+                {
+                    $unwind: "$created_by"
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
+                },
+                {
+                    $limit: limit
+                }
+            ]);
 
-            let responseData = inProgressWorkRequestList;
+            let responseData = completedWorkRequestList;
 
             return res.send({
                 status: 200,
@@ -188,15 +257,41 @@ module.exports.workRequestDetails = (req, res) => {
         try {
             const userID = req.headers.userID;
             let query = req.query;
-            let searchData = { _id: query.id, user_id: userID, is_deleted: false };
+            let searchData = { _id: new mongoose.Types.ObjectId(query.id), workspace_id: new mongoose.Types.ObjectId(query.workspace_id), is_deleted: false };
 
-            let workRequestData = await RequestedWorks.findOne(searchData);
+            // let workRequestData = await RequestedWorks.findOne(searchData);
+
+            let workRequestData = await RequestedWorks.aggregate([
+                {
+                    $match: searchData
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "created_by",
+                        foreignField: "_id",
+                        pipeline: [
+                            {
+                                $project: {
+                                    _id: 1,
+                                    name: 1,
+                                    email: 1
+                                }
+                            }
+                        ],
+                        as: "created_by"
+                    }
+                },
+                {
+                    $unwind: "$created_by"
+                }
+            ]);
 
             if (!workRequestData)
                 return res.send({
-                    status: 404, 
-                    msg: responseMessages.workRequestNotFound, 
-                    data: {}, 
+                    status: 404,
+                    msg: responseMessages.workRequestNotFound,
+                    data: {},
                     purpose: purpose
                 });
 

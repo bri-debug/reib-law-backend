@@ -7,12 +7,13 @@ const UserSchema = new mongoose.Schema({
     business_name: String,
     password: String,
     status: String,
+    plan: { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
     otp: Number,
     otp_valid: Number,
     is_active: { type: Boolean, default: true },
-    is_deleted: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    is_deleted: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 const User = mongoose.model('User', UserSchema);

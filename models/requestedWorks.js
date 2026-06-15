@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const RequestedWorkSchema = new mongoose.Schema({
-    user_id: String,
+    created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true },
     type: String,
     title: String,
     description: String,
@@ -17,9 +18,9 @@ const RequestedWorkSchema = new mongoose.Schema({
     complition_date: Date,
     completion_remarks: String,
     tags: [String],
-    is_deleted: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    is_deleted: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 const RequestedWork = mongoose.model('RequestedWork', RequestedWorkSchema);
