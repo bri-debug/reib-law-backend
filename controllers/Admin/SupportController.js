@@ -89,7 +89,7 @@ module.exports.supportMessages = (req, res) => {
             if (!client) return;
 
             const conversation = await SupportConversation.findOne({
-                user_id: query.client_id,
+                workspace_id: query.workspace_id,
                 is_deleted: false,
             });
 
@@ -118,7 +118,7 @@ module.exports.supportMessages = (req, res) => {
                         ? mapConversation(conversation)
                         : {
                             _id: null,
-                            client_id: client._id,
+                            workspace_id: query.workspace_id,
                             client_name: client.name,
                             client_email: client.email,
                             last_message: '',
@@ -169,13 +169,13 @@ module.exports.sendSupportMessage = (req, res) => {
             if (!client) return;
 
             let conversation = await SupportConversation.findOne({
-                user_id: body.client_id,
+                workspace_id: body.workspace_id,
                 is_deleted: false,
             });
 
             if (!conversation) {
                 conversation = await SupportConversation.create({
-                    user_id: body.client_id,
+                    workspace_id: body.workspace_id,
                     client_name: client.name,
                     client_email: client.email,
                     last_message: '',
