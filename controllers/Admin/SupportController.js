@@ -191,7 +191,7 @@ module.exports.sendSupportMessage = (req, res) => {
 
             const createdMessage = await SupportMessage.create({
                 conversation_id: conversation._id,
-                user_id: body.client_id,
+                // user_id: body.client_id,
                 sender_role: 'admin',
                 sender_id: adminID,
                 sender_name: admin.name,
