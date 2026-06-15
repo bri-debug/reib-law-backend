@@ -8,7 +8,7 @@ const { getIO } = require("../../helpers/socketFunctions");
 function mapConversation(conversationDoc) {
     return {
         _id: conversationDoc._id,
-        client_id: conversationDoc.user_id,
+        workspace_id: conversationDoc.workspace_id,
         client_name: conversationDoc.client_name,
         client_email: conversationDoc.client_email,
         last_message: conversationDoc.last_message,
