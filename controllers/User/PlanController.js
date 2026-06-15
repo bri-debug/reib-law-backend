@@ -33,7 +33,7 @@ module.exports.userPlanDetails = (req, res) => {
 
             let userDetails = await Users.findOne({ _id: userID });
             userDetails = userDetails.toObject();
-            let findPlanDetails = await Plans.findOne({ _id: userDetails?.plan ?? "6a0de5798837a31011e2031c" });
+            let findPlanDetails = await Plans.findOne({ _id: userDetails?.plan ?? "6a2ffe09fe7be9aa4da0380f" });
             findPlanDetails = findPlanDetails.toObject();
             findPlanDetails.price = findPlanDetails.price[0];
             
