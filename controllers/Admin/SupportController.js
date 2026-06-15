@@ -206,8 +206,8 @@ module.exports.sendSupportMessage = (req, res) => {
             await SupportConversation.updateOne(
                 { _id: conversation._id },
                 {
-                    client_name: client.name,
-                    client_email: client.email,
+                    // client_name: client.name,
+                    // client_email: client.email,
                     last_message: createdMessage.message,
                     last_message_sender: 'admin',
                     last_message_importance: createdMessage.importance,
