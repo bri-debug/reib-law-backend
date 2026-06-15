@@ -164,9 +164,9 @@ module.exports.sendSupportMessage = (req, res) => {
                 });
             }
 
-            const client = await findClientOrSendNotFound(res, body.client_id, purpose);
+            // const client = await findClientOrSendNotFound(res, body.client_id, purpose);
 
-            if (!client) return;
+            // if (!client) return;
 
             let conversation = await SupportConversation.findOne({
                 workspace_id: body.workspace_id,
