@@ -84,9 +84,9 @@ module.exports.supportMessages = (req, res) => {
         const purpose = 'Fetch Support Messages';
         try {
             const query = req.query;
-            const client = await findClientOrSendNotFound(res, query.client_id, purpose);
+            // const client = await findClientOrSendNotFound(res, query.client_id, purpose);
 
-            if (!client) return;
+            // if (!client) return;
 
             const conversation = await SupportConversation.findOne({
                 workspace_id: query.workspace_id,
