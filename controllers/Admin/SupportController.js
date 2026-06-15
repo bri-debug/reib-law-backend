@@ -183,7 +183,7 @@ module.exports.sendSupportMessage = (req, res) => {
                 });
             }
 
-            const workspaceDetails = await Workspaces.findById(query.workspace_id);
+            const workspaceDetails = await Workspaces.findById(body.workspace_id);
 
             if (!workspaceDetails) {
                 return res.send({
