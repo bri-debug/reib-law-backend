@@ -41,6 +41,8 @@ router.get('/work_request_details', AuthenticationMiddlewares.authenticateAdminR
 router.put('/assign_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestAssignSchema, 'body'), workRequestController.assignWorkRequest); //Work Request Assign
 router.post('/create_new_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.workRequestCreateSchema, 'body'), workRequestController.createNewWorkRequest); //Create New Work Request
 router.post('/upload_work_doc', AuthenticationMiddlewares.authenticateAdminRequestAPI, commonFunctions.uploadMultiple, workRequestController.uploadDoc); //Upload Work Document
+router.put('/completed_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.completedWorkRequestSchema, 'query'), workRequestController.completedWorkRequest); //Completed Work Request
+router.put('/pause_work_request', AuthenticationMiddlewares.authenticateAdminRequestAPI, validateRequest.validate(workRequestValidationSchema.pausedWorkRequestSchema, 'query'), workRequestController.pauseWorkRequest); //Pause Work Request
 
 /* ############################################ Resource Senter ############################################ */
 router.post('/upload_template_doc', AuthenticationMiddlewares.authenticateAdminRequestAPI, commonFunctions.uploadMultiple, resourceCenterController.uploadTemplateDoc); //Upload Template Document

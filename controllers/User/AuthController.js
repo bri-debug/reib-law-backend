@@ -73,7 +73,8 @@ module.exports.newUserCreate = (req, res) => {
                     create_work_request: true,
                     chat_support: true,
                     manage_members: true
-                }
+                },
+                joinedAt: new Date()
             });
 
             let accessToken = jwt.sign({ user_id: userCreateDetails._id }, jwtOptionsAccess.secret, jwtOptionsAccess.options);

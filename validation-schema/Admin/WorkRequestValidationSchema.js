@@ -40,5 +40,19 @@ module.exports.workRequestCreateSchema = Joi.object().keys({
     priority: Joi.string().required(),
     files: Joi.array().empty(Joi.array().length(0)),
     tags: Joi.array().empty(Joi.array().length(0)),
-    status: Joi.string().valid('active', 'completed').required(),
+    status: Joi.string().valid('active', 'completed', 'paused').required(),
+    complition_date: Joi.string().optional().allow('', null),
+    paused_date: Joi.string().optional().allow('', null),
+});
+
+// completed work request validation schema
+module.exports.completedWorkRequestSchema = Joi.object().keys({
+    id: Joi.string().required(),
+    completion_remarks: Joi.string().optional().allow('', null),
+});
+
+// paused work request validation schema
+module.exports.pausedWorkRequestSchema = Joi.object().keys({
+    id: Joi.string().required(),
+    paused_remarks: Joi.string().optional().allow('', null),
 });

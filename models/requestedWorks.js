@@ -16,7 +16,9 @@ const RequestedWorkSchema = new mongoose.Schema({
     internal_notes: String,
     assigned_to: String,
     complition_date: Date,
+    paused_date: Date,
     completion_remarks: String,
+    paused_remarks: String,
     tags: [String],
     is_deleted: { type: Boolean, default: false }
 }, {

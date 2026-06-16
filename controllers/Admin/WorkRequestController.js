@@ -260,6 +260,8 @@ module.exports.createNewWorkRequest = (req, res) => {
                 files: body.files,
                 tags: body.tags,
                 status: body.status,
+                complition_date: (body?.complition_date) ? new Date(body?.complition_date) : null,
+                paused_date: (body?.paused_date) ? new Date(body?.paused_date) : null,
                 is_deleted: false,
             };
 
@@ -315,6 +317,121 @@ module.exports.uploadDoc = (req, res) => {
             });
         } catch (err) {
             console.log('Upload Documents Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
+| API name          :  completedWorkRequest
+| Response          :  Respective response message in JSON format
+| Logic             :  Completed Work Request
+| Request URL       :  BASE_URL/admin/completed_work_request
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.completedWorkRequest = (req, res) => {
+    (async () => {
+        let purpose = 'Completed Work Request';
+        try {
+            const userID = req.headers.userID;
+            let body = req.body;
+
+            const workRequestData = await RequestedWorks.findById(body.id);
+
+            if (!workRequestData || workRequestData.is_deleted)
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestNotFound, 
+                    data: {}, 
+                    purpose: purpose
+                });
+            else if (workRequestData.status == "completed")
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestAlreadyCompleted, 
+                    data: {}, 
+                    purpose: purpose
+                });
+
+            await RequestedWorks.updateOne({ _id: body.id }, { $set: { status: "completed", complition_date: new Date(), completion_remarks: (body?.completion_remarks || null) } });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.workRequestCompleted,
+                data: {},
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Completed Work Request Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
+
+/*
+|------------------------------------------------ 
+| API name          :  pauseWorkRequest
+| Response          :  Respective response message in JSON format
+| Logic             :  Pause Work Request
+| Request URL       :  BASE_URL/admin/pause_work_request
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.pauseWorkRequest = (req, res) => {
+    (async () => {
+        let purpose = 'Pause Work Request';
+        try {
+            const userID = req.headers.userID;
+            let body = req.body;
+
+            const workRequestData = await RequestedWorks.findById(body.id);
+
+            if (!workRequestData || workRequestData.is_deleted)
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestNotFound, 
+                    data: {}, 
+                    purpose: purpose
+                });
+            else if (workRequestData.status == "completed")
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestAlreadyCompleted, 
+                    data: {}, 
+                    purpose: purpose
+                });
+            else if (workRequestData.status == "paused")
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestAlreadyPaused, 
+                    data: {}, 
+                    purpose: purpose
+                });
+
+            await RequestedWorks.updateOne({ _id: body.id }, { $set: { status: "paused", paused_date: new Date(), paused_remarks: (body?.paused_remarks || null) } });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.workRequestPaused,
+                data: {},
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Pause Work Request Error: ', err);
             return res.send({
                 status: 500,
                 msg: responseMessages.serverError,
