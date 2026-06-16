@@ -33,7 +33,7 @@ router.post('/registration', validateRequest.validate(authenticationSchema.signu
 router.post('/login', validateRequest.validate(authenticationSchema.signinSchema, 'body'), authController.userLogin); //User Login
 router.put('/forget_password', validateRequest.validate(authenticationSchema.forgetPasswordSchema, 'body'), authController.forgetPassword); //Forget Password
 router.put('/reset_password', validateRequest.validate(authenticationSchema.resetPasswordSchema, 'body'), authController.resetPassword); //Reset Password
-router.put('/update_password', validateRequest.validate(authenticationSchema.updatePasswordSchema, 'body'), authController.updatePassword); //Update Password
+router.put('/update_password', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.updatePasswordSchema, 'body'), authController.updatePassword); //Update Password
 
 /* ############################################ Profile ############################################ */
 router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.profileFetchSchema, 'body'), authController.getProfile); //User Profile
