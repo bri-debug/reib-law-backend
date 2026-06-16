@@ -56,3 +56,8 @@ module.exports.pausedWorkRequestSchema = Joi.object().keys({
     id: Joi.string().required(),
     paused_remarks: Joi.string().optional().allow('', null),
 });
+
+// actived work request validation schema
+module.exports.activedWorkRequestSchema = Joi.object().keys({
+    id: Joi.string().required(),
+});

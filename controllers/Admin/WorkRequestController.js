@@ -441,3 +441,64 @@ module.exports.pauseWorkRequest = (req, res) => {
         }
     })();
 };
+
+/*
+|------------------------------------------------ 
+| API name          :  activeWorkRequest
+| Response          :  Respective response message in JSON format
+| Logic             :  Active Work Request
+| Request URL       :  BASE_URL/admin/active_work_request
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.activeWorkRequest = (req, res) => {
+    (async () => {
+        let purpose = 'Active Work Request';
+        try {
+            const userID = req.headers.userID;
+            let body = req.body;
+
+            const workRequestData = await RequestedWorks.findById(body.id);
+
+            if (!workRequestData || workRequestData.is_deleted)
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestNotFound, 
+                    data: {}, 
+                    purpose: purpose
+                });
+            else if (workRequestData.status == "completed")
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestAlreadyCompleted, 
+                    data: {}, 
+                    purpose: purpose
+                });
+            else if (workRequestData.status == "active")
+                return res.send({
+                    status: 404, 
+                    msg: responseMessages.workRequestAlreadyActive, 
+                    data: {}, 
+                    purpose: purpose
+                });
+
+            await RequestedWorks.updateOne({ _id: body.id }, { $set: { status: "active", paused_date: null, paused_remarks: null } });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.workRequestActived,
+                data: {},
+                purpose: purpose,
+            });
+        } catch (err) {
+            console.log('Active Work Request Error: ', err);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose,
+            });
+        }
+    })();
+};
