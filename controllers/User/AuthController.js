@@ -527,6 +527,7 @@ module.exports.updatePassword = (req, res) => {
             console.log(userDetails);
             console.log(userID);
             console.log(body);
+            console.log(req.headers);
 
             const newPassword = CryptoJS.AES.encrypt(body.password, global.constants.passCode_for_password).toString();
             await Users.updateOne({ _id: userID }, { $set: { otp: null, otp_valid: null, password: newPassword } });
