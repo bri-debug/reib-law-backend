@@ -405,8 +405,8 @@ module.exports.getProfile = (req, res) => {
                         name: "$userDetails.name",
                         email: "$userDetails.email",
                         phone: "$userDetails.phone",
-                        role: 1,
-                        joinedAt: 1
+                        // role: 1,
+                        // joinedAt: 1
                     }
                 }
             ]);
