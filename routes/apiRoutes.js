@@ -17,6 +17,7 @@ const authenticationSchema = require('../validation-schema/User/AuthValidationSc
 const scheduleCallValidationSchema = require('../validation-schema/User/ScheduleCallValidationSchema');
 const workRequestValidationSchema = require('../validation-schema/User/WorkRequestValidationSchema');
 const supportValidationSchema = require('../validation-schema/User/SupportValidationSchema');
+const workspaceMemberValidationSchema = require('../validation-schema/User/WorkspaceMemberValidationSchema');
 
 /* ############################################ Controllers ############################################ */
 const authController = require('../controllers/User/AuthController');
@@ -25,12 +26,14 @@ const workRequestController = require('../controllers/User/WorkRequestController
 const resourceCenterController = require('../controllers/User/ResourceCenterController');
 const planController = require('../controllers/User/PlanController');
 const supportController = require('../controllers/User/SupportController');
+const workSpaceMemberController = require('../controllers/User/WorkSpaceMemberController');
 
 /* ############################################ Authentication ############################################ */
 router.post('/registration', validateRequest.validate(authenticationSchema.signupSchema, 'body'), authController.newUserCreate); //User Registration
 router.post('/login', validateRequest.validate(authenticationSchema.signinSchema, 'body'), authController.userLogin); //User Login
 router.put('/forget_password', validateRequest.validate(authenticationSchema.forgetPasswordSchema, 'body'), authController.forgetPassword); //Forget Password
 router.put('/reset_password', validateRequest.validate(authenticationSchema.resetPasswordSchema, 'body'), authController.resetPassword); //Reset Password
+router.put('/update_password', validateRequest.validate(authenticationSchema.updatePasswordSchema, 'body'), authController.updatePassword); //Update Password
 
 /* ############################################ Profile ############################################ */
 router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, authController.getProfile); //User Profile
@@ -56,5 +59,8 @@ router.get('/fetch_user_plan_details', AuthenticationMiddlewares.authenticateReq
 /* ############################################ Support ############################################ */
 router.get('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(supportValidationSchema.showSupportMessageSchema, 'query'), supportController.supportMessages); //Fetch Support Messages
 router.post('/support_messages', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(supportValidationSchema.sendSupportMessageSchema, 'body'), supportController.sendSupportMessage); //Send Support Message
+
+/* ############################################ Workspace Member ############################################ */
+router.post('/member_add', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(workspaceMemberValidationSchema.workMemberCreateSchema, 'body'), workSpaceMemberController.newMemberAdd); //Create New Workspace Member
 
 module.exports = router;

@@ -11,6 +11,7 @@ module.exports = {
     ProfileDetails: " Fetch profile Details successfully",
     invalidEmail: "Invalid Email Address ",
     passwordreset: "Password reseted successfully, Log in to continue",
+    passwordUpdate: "Password Updated successfully",
     resetunable: "Unable to Reset the Password",
     loginSuccess: "Logged in successfully",
     accountDelete: "Account deleted successfully",

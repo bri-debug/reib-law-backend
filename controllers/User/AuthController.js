@@ -159,7 +159,7 @@ module.exports.userLogin = (req, res) => {
                         }
                     }
                 ]);
-                
+
                 let accessToken = jwt.sign({ user_id: userDetails._id }, jwtOptionsAccess.secret, jwtOptionsAccess.options);
                 let refreshToken = jwt.sign({ user_id: userDetails._id }, jwtOptionsRefresh.secret, jwtOptionsRefresh.options);
 
@@ -471,3 +471,41 @@ module.exports.updateProfile = (req, res) => {
         }
     })();
 };
+
+/*
+|------------------------------------------------ 
+| API name          :  updatePassword
+| Response          :  Respective response message in JSON format
+| Logic             :  Update Password
+| Request URL       :  BASE_URL/api/update_password
+| Request method    :  PUT
+| Author            :  Mainak Saha
+|------------------------------------------------
+*/
+module.exports.updatePassword = (req, res) => {
+    (async () => {
+        let purpose = "Update Password";
+        try {
+            const userID = req.headers.userID;
+            let body = req.body;
+
+            const newPassword = CryptoJS.AES.encrypt(body.password, global.constants.passCode_for_password).toString();
+            await Users.updateOne({ _id: userID }, { $set: { otp: null, otp_valid: null, password: newPassword } });
+
+            return res.send({
+                status: 200,
+                msg: responseMessages.passwordUpdate,
+                data: {},
+                purpose: purpose
+            })
+        } catch (e) {
+            console.log("Update Password ERROR : ", e);
+            return res.send({
+                status: 500,
+                msg: responseMessages.serverError,
+                data: {},
+                purpose: purpose
+            })
+        }
+    })();
+}

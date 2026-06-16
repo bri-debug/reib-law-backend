@@ -63,3 +63,9 @@ module.exports.profileUpdateSchema = Joi.object().keys({
         }),
     phone: Joi.string().required(),
 });
+
+// update password validation
+module.exports.updatePasswordSchema = Joi.object().keys({
+    password: Joi.string().min(8).required(),
+    confirm_password: Joi.string().valid(Joi.ref('password')).required(),
+});
