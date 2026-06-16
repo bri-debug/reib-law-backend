@@ -370,6 +370,7 @@ module.exports.getProfile = (req, res) => {
         let purpose = 'User Profile';
         try {
             const userID = req.headers.userID;
+            let query = req.query;
             let userDetails = await Users.findOne({ _id: userID, is_deleted: false });
 
             if (!userDetails) {
@@ -381,10 +382,41 @@ module.exports.getProfile = (req, res) => {
                 });
             }
 
+            let workspaceAccess = await WorkspaceMembers.findOne({ user_id: userID, workspace_id: query.workspace_id });
+            let workspaceMembers = await WorkspaceMembers.aggregate([
+                {
+                    $match: { user_id: { $ne: userID }, workspace_id: query.workspace_id }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "user_id",
+                        foreignField: "_id",
+                        as: "userDetails"
+                    }
+                },
+                {
+                    $unwind: "$userDetails"
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        user_id: "$user_id",
+                        name: "$userDetails.name",
+                        email: "$userDetails.email",
+                        phone: "$userDetails.phone",
+                        role: "$role",
+                        joinedAt: 1
+                    }
+                }
+            ]);
+
             let responseData = userDetails.toObject();
             delete responseData.password;
             delete responseData.otp;
             delete responseData.otp_valid;
+            responseData.role = workspaceAccess.role;
+            responseData.workspaceMembers = workspaceMembers;
 
             return res.send({
                 status: 200,
