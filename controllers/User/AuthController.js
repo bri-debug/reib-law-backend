@@ -523,6 +523,9 @@ module.exports.updatePassword = (req, res) => {
             const userID = req.headers.userID;
             let body = req.body;
 
+            let userDetails = await Users.findOne({ _id: userID, is_deleted: false });
+            console.log(userDetails);
+
             const newPassword = CryptoJS.AES.encrypt(body.password, global.constants.passCode_for_password).toString();
             await Users.updateOne({ _id: userID }, { $set: { otp: null, otp_valid: null, password: newPassword } });
 
