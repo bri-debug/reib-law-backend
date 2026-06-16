@@ -5,6 +5,7 @@ const CryptoJS = require('crypto-js');
 const axios = require('axios');
 const crypto = require('crypto');
 const { v7: uuidv7 } = require('uuid');
+const mongoose = require('mongoose');
 
 // ################################ Model ################################ //
 const Users = require('../../models/users');
@@ -383,9 +384,10 @@ module.exports.getProfile = (req, res) => {
             }
 
             let workspaceAccess = await WorkspaceMembers.findOne({ user_id: userID, workspace_id: query.workspace_id });
+            
             let workspaceMembers = await WorkspaceMembers.aggregate([
                 {
-                    $match: { user_id: { $ne: userID }, workspace_id: query.workspace_id }
+                    $match: { user_id: { $ne: new mongoose.Types.ObjectId(userID) }, workspace_id: new mongoose.Types.ObjectId(query.workspace_id) }
                 },
                 {
                     $lookup: {
@@ -410,7 +412,7 @@ module.exports.getProfile = (req, res) => {
                     }
                 }
             ]);
-
+            
             let responseData = userDetails.toObject();
             delete responseData.password;
             delete responseData.otp;
