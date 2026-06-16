@@ -64,6 +64,11 @@ module.exports.profileUpdateSchema = Joi.object().keys({
     phone: Joi.string().required(),
 });
 
+// profile fetch validation
+module.exports.profileFetchSchema = Joi.object().keys({
+    workspace_id: Joi.string().required(),
+});
+
 // update password validation
 module.exports.updatePasswordSchema = Joi.object().keys({
     password: Joi.string().min(8).required(),

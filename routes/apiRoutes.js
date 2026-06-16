@@ -36,7 +36,7 @@ router.put('/reset_password', validateRequest.validate(authenticationSchema.rese
 router.put('/update_password', validateRequest.validate(authenticationSchema.updatePasswordSchema, 'body'), authController.updatePassword); //Update Password
 
 /* ############################################ Profile ############################################ */
-router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, authController.getProfile); //User Profile
+router.get('/profile', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.profileFetchSchema, 'body'), authController.getProfile); //User Profile
 router.put('/profile', AuthenticationMiddlewares.authenticateRequestAPI, validateRequest.validate(authenticationSchema.profileUpdateSchema, 'body'), authController.updateProfile); //Update User Profile
 
 /* ############################################ Check-In Call ############################################ */
